@@ -10,10 +10,11 @@ http://www.springframework.org/schema/aop
 http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
 http://www.springframework.org/schema/context
 http://www.springframework.org/schema/context/spring-context-3.0.xsd">
-	
-	<!--  id가 simpleUrlController인 빈을 생성합니다. -->
+
+<!-- 
+	  id가 simpleUrlController인 빈을 생성합니다. 
 	<bean id="simpleUrlController" class="com.spring.ex01.SimpleUrlController" />
-	<!-- SimpleUrlHandlerMapping 클래스를 이용해 /test/index.do로 요청 시 simpleUrlController를 호출하도록 매핑합니다. -->
+	 SimpleUrlHandlerMapping 클래스를 이용해 /test/index.do로 요청 시 simpleUrlController를 호출하도록 매핑합니다. 
 	<bean id="urlMapping"
 		class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
 	  <property name="mappings">
@@ -22,4 +23,43 @@ http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 	  	</props>
 	  </property>
 	</bean>
+ -->	
+ 
+ <!-- 컨트롤러에서 ModelAndView 인자로 뷰이름이 반환되면 InternalResourceViewResolver의 프로퍼티스 prefix 속성에 지정된 /test폴더에서
+ 	ModelAndView 인자로 넘어온 뷰 이름에 해당되는 jsp를 선택해 DispatcherServlet으로 보냅니다.
+  -->
+<bean id="viewResolver" class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+	<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+	<property name="prefix" value="/test/" />
+	<property name="suffix" value=".jsp" />
+</bean>
+ 
+<bean id="userUrlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+ 	<property name="mappings">
+ 		<props>
+ 			<prop key="/test/*.do">userController</prop>
+ 		</props>
+ 	</property>
+ </bean>
+ 	
+<bean id="userController" class="com.spring.ex02.UserController">
+	<!-- methodNameResover 프로퍼티에 userMethodNameResolver를 주입해서 지정한 요청명에 대해
+		직접 메서드를 호출하게 합니다. -->
+	<property name="methodNameResolver">
+		<ref local="userMethodNameResolver" />
+	</property>
+</bean>
+
+<!-- PropertiesMethodNameResolver를 이용해 /test/login.do로 요청하면 userController의 login 메서드를 호출합니다. -->
+<bean id="userMethodNameResolver"
+	class="org.springframework.web.servlet.mvc.multiaction.PropertiesMethodNameResolver" >
+	<property name="mappings">
+		<props>
+			<prop key="/test/login.do">login</prop>
+			<!-- URL 요청명과 메서드 이름을 동일하게 하여 회원 정보를 요청합니다. -->
+			<prop key="/test/memberInfo.do">memberInfo</prop>
+		</props>
+	</property>
+</bean>
+
 </beans>
