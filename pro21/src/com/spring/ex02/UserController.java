@@ -12,6 +12,7 @@ public class UserController extends MultiActionController{
 			throws Exception{
 			String userID ="";
 			String passwd ="";
+			String viewName=getViewName(request);
 			ModelAndView mav = new ModelAndView();
 			request.setCharacterEncoding("utf-8");
 			userID=request.getParameter("userID");
@@ -21,7 +22,8 @@ public class UserController extends MultiActionController{
 			mav.addObject("userID", userID);
 			mav.addObject("passwd", passwd);
 			//ModelAndView 객체에 포워딩할 JSP 이름을 설정합니다.
-			mav.setViewName("result");
+			//mav.setViewName("result");
+			mav.setViewName(viewName);
 			return mav;
 		}
 	public ModelAndView memberInfo(HttpServletRequest request, HttpServletResponse response) throws Exception{
@@ -40,4 +42,37 @@ public class UserController extends MultiActionController{
 		mav.setViewName("memberInfo");
 		return mav;
 	}
-}
+	
+	private  String getViewName(HttpServletRequest request) throws Exception {
+	      String contextPath = request.getContextPath();
+	      String uri = (String)request.getAttribute("javax.servlet.include.request_uri");
+	      if(uri == null || uri.trim().equals("")) {
+	         uri = request.getRequestURI();
+	      }
+
+	      int begin = 0;
+	      if(!((contextPath==null)||("".equals(contextPath)))){
+	         begin = contextPath.length();
+	      }
+
+	      int end;
+	      if(uri.indexOf(";")!=-1){
+	         end=uri.indexOf(";");
+	      }else if(uri.indexOf("?")!=-1){
+	         end=uri.indexOf("?");
+	      }else{
+	         end=uri.length();
+	      }
+
+	      String fileName=uri.substring(begin,end);
+	      if(fileName.indexOf(".")!=-1){
+	         fileName=fileName.substring(0,fileName.lastIndexOf("."));
+	      }
+	      if(fileName.lastIndexOf("/")!=-1){
+	         fileName=fileName.substring(fileName.lastIndexOf("/"),fileName.length());
+	      }
+	      return fileName;
+	   }
+		
+	}
+
